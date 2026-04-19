@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { events } from '../data/events'
+import InfoCard from '../components/InfoCard'
 
 export default function DashboardPage() {
   const liveCount = events.filter((event) => event.status === 'En vivo').length
@@ -29,13 +30,13 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 md:grid-cols-3">
         {cards.map((card) => (
-          <div
+          <InfoCard
             key={card.label}
-            className="rounded-3xl border border-white/10 bg-white/5 p-6"
-          >
-            <p className="text-sm text-slate-400">{card.label}</p>
-            <p className="mt-3 text-3xl font-bold text-white">{card.value}</p>
-          </div>
+            label={card.label}
+            value={card.value}
+            cardClassName="rounded-3xl border border-white/10 bg-white/5 p-6"
+            valueClassName="mt-3 text-3xl font-bold text-white"
+          />
         ))}
       </div>
 

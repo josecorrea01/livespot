@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
-import EventCard from '../components/EventCard'
 import { events } from '../data/events'
+import EventCard from '../components/EventCard'
+import InfoCard from '../components/InfoCard'
 
 export default function HomePage() {
   const featured = events.slice(0, 3)
@@ -41,9 +42,21 @@ export default function HomePage() {
 
         <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
           <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard label="Eventos activos" value="28" />
-            <StatCard label="Usuarios registrados" value="1.4K" />
-            <StatCard label="Satisfacción" value="96%" />
+            <InfoCard
+              label="Eventos activos"
+              value="28"
+              valueClassName="mt-2 text-2xl font-bold text-white"
+            />
+            <InfoCard
+              label="Usuarios registrados"
+              value="1.4K"
+              valueClassName="mt-2 text-2xl font-bold text-white"
+            />
+            <InfoCard
+              label="Satisfacción"
+              value="96%"
+              valueClassName="mt-2 text-2xl font-bold text-white"
+            />
           </div>
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
@@ -79,15 +92,6 @@ export default function HomePage() {
           ))}
         </div>
       </section>
-    </div>
-  )
-}
-
-function StatCard({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <p className="text-sm text-slate-400">{label}</p>
-      <p className="mt-2 text-2xl font-bold text-white">{value}</p>
     </div>
   )
 }

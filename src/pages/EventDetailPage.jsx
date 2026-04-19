@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router'
 import { events } from '../data/events'
 import ReservationForm from '../components/ReservationForm'
+import InfoCard from '../components/InfoCard'
 
 export default function EventDetailPage() {
   const { id } = useParams()
@@ -47,24 +48,31 @@ export default function EventDetailPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <InfoCard label="Fecha" value={event.date} />
-            <InfoCard label="Hora" value={event.time} />
-            <InfoCard label="Anfitrión" value={event.host} />
-            <InfoCard label="Precio" value={event.price} />
+            <InfoCard
+              label="Fecha"
+              value={event.date}
+              cardClassName="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+            />
+            <InfoCard
+              label="Hora"
+              value={event.time}
+              cardClassName="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+            />
+            <InfoCard
+              label="Anfitrión"
+              value={event.host}
+              cardClassName="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+            />
+            <InfoCard
+              label="Precio"
+              value={event.price}
+              cardClassName="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
+            />
           </div>
         </div>
       </section>
 
       <ReservationForm eventTitle={event.title} />
-    </div>
-  )
-}
-
-function InfoCard({ label, value }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
-      <p className="text-sm text-slate-400">{label}</p>
-      <p className="mt-2 font-medium text-white">{value}</p>
     </div>
   )
 }
