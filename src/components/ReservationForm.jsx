@@ -8,6 +8,7 @@ export default function ReservationForm({ eventTitle }) {
 
   const [errors, setErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -30,6 +31,8 @@ export default function ReservationForm({ eventTitle }) {
 
     if (!formData.name.trim()) {
       newErrors.name = 'Ingresa tu nombre.'
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = 'Ingresa al menos 3 caracteres.'
     }
 
     if (!formData.email.trim()) {
@@ -41,7 +44,7 @@ export default function ReservationForm({ eventTitle }) {
     return newErrors
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
 
     const newErrors = validateForm()
@@ -52,15 +55,24 @@ export default function ReservationForm({ eventTitle }) {
       return
     }
 
+    setIsSubmitting(true)
     setErrors({})
-    setSuccessMessage(
-      `Reserva confirmada para ${eventTitle}. Hemos enviado la confirmación a ${formData.email}.`
-    )
+    setSuccessMessage('')
 
-    setFormData({
-      name: '',
-      email: '',
-    })
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 900))
+
+      setSuccessMessage(
+        `Reserva confirmada para ${eventTitle}. Hemos enviado la confirmación a ${formData.email}.`
+      )
+
+      setFormData({
+        name: '',
+        email: '',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -84,6 +96,7 @@ export default function ReservationForm({ eventTitle }) {
           value={formData.name}
           onChange={handleChange}
           error={errors.name}
+          disabled={isSubmitting}
         />
 
         <FormField
@@ -93,20 +106,34 @@ export default function ReservationForm({ eventTitle }) {
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
+          disabled={isSubmitting}
         />
 
         <button
           type="submit"
-          className="w-full rounded-2xl bg-indigo-500 px-4 py-3 font-semibold text-white transition hover:bg-indigo-400"
+          disabled={isSubmitting}
+          className={`w-full rounded-2xl px-4 py-3 font-semibold text-white transition ${
+            isSubmitting
+              ? 'cursor-not-allowed bg-indigo-300/60'
+              : 'bg-indigo-500 hover:bg-indigo-400'
+          }`}
         >
-          Reservar lugar
+          {isSubmitting ? 'Procesando reserva...' : 'Reservar lugar'}
         </button>
       </form>
     </aside>
   )
 }
 
-function FormField({ type, name, placeholder, value, onChange, error }) {
+function FormField({
+  type,
+  name,
+  placeholder,
+  value,
+  onChange,
+  error,
+  disabled,
+}) {
   return (
     <div>
       <input
@@ -115,7 +142,8 @@ function FormField({ type, name, placeholder, value, onChange, error }) {
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 ${
+        disabled={disabled}
+        className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 disabled:cursor-not-allowed disabled:opacity-70 ${
           error
             ? 'border-rose-400/60 focus:border-rose-400'
             : 'border-white/10 focus:border-indigo-400'
