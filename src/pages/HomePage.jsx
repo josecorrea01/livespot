@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import EventCard from '../components/EventCard'
 import { events } from '../data/events'
 
 export default function HomePage() {
@@ -9,7 +10,7 @@ export default function HomePage() {
       <section className="grid gap-8 rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl lg:grid-cols-2">
         <div className="space-y-6">
           <span className="inline-flex rounded-full border border-indigo-400/40 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-300">
-           Eventos y experiencias en vivo
+            Eventos y experiencias en vivo
           </span>
 
           <div className="space-y-4">
@@ -74,34 +75,7 @@ export default function HomePage() {
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {featured.map((event) => (
-            <article
-              key={event.id}
-              className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
-            >
-              <img
-                src={event.image}
-                alt={event.title}
-                className="h-52 w-full object-cover"
-              />
-              <div className="space-y-3 p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
-                    {event.category}
-                  </span>
-                  <span className="text-xs text-indigo-300">{event.status}</span>
-                </div>
-                <h3 className="text-xl font-semibold text-white">{event.title}</h3>
-                <p className="text-sm leading-6 text-slate-300">
-                  {event.description}
-                </p>
-                <Link
-                  to={`/events/${event.id}`}
-                  className="inline-flex rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
-                >
-                  Ver detalle
-                </Link>
-              </div>
-            </article>
+            <EventCard key={event.id} event={event} variant="featured" />
           ))}
         </div>
       </section>

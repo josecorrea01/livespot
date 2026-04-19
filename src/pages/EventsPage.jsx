@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import EventCard from '../components/EventCard'
 import { events } from '../data/events'
 
 export default function EventsPage() {
@@ -67,39 +67,7 @@ export default function EventsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredEvents.map((event) => (
-            <article
-              key={event.id}
-              className="overflow-hidden rounded-3xl border border-white/10 bg-white/5"
-            >
-              <img
-                src={event.image}
-                alt={event.title}
-                className="h-52 w-full object-cover"
-              />
-              <div className="space-y-3 p-5">
-                <div className="flex items-center justify-between">
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
-                    {event.category}
-                  </span>
-                  <span className="text-xs text-indigo-300">{event.price}</span>
-                </div>
-
-                <h2 className="text-xl font-semibold text-white">{event.title}</h2>
-                <p className="text-sm text-slate-400">
-                  {event.date} · {event.time}
-                </p>
-                <p className="text-sm leading-6 text-slate-300">
-                  {event.description}
-                </p>
-
-                <Link
-                  to={`/events/${event.id}`}
-                  className="inline-flex rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400"
-                >
-                  Ver detalle
-                </Link>
-              </div>
-            </article>
+            <EventCard key={event.id} event={event} />
           ))}
         </div>
       )}
