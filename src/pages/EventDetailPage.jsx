@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router'
 import { events } from '../data/events'
 import ReservationForm from '../components/ReservationForm'
 import InfoCard from '../components/InfoCard'
+import { formatEventDate } from '../utils/eventFormatters'
 
 export default function EventDetailPage() {
   const { id } = useParams()
@@ -50,7 +51,7 @@ export default function EventDetailPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <InfoCard
               label="Fecha"
-              value={event.date}
+              value={formatEventDate(event.date)}
               cardClassName="rounded-2xl border border-white/10 bg-slate-950/60 p-4"
             />
             <InfoCard

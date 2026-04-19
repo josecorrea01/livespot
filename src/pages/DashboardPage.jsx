@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { events } from '../data/events'
 import InfoCard from '../components/InfoCard'
+import { formatEventDateTime } from '../utils/eventFormatters'
 
 export default function DashboardPage() {
   const liveCount = events.filter((event) => event.status === 'En vivo').length
@@ -58,7 +59,7 @@ export default function DashboardPage() {
                   <div>
                     <p className="font-medium text-white">{event.title}</p>
                     <p className="mt-1 text-sm text-slate-400">
-                      {event.date} · {event.time} · {event.category}
+                      {formatEventDateTime(event.date, event.time)} · {event.category}
                     </p>
                   </div>
 
@@ -91,7 +92,7 @@ export default function DashboardPage() {
                   {nextEvent.title}
                 </p>
                 <p className="mt-1 text-sm text-slate-300">
-                  {nextEvent.date} · {nextEvent.time}
+                  {formatEventDateTime(nextEvent.date, nextEvent.time)}
                 </p>
               </div>
 

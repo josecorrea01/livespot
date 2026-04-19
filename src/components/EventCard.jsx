@@ -1,4 +1,5 @@
 import { Link } from 'react-router'
+import { formatEventDateTime } from '../utils/eventFormatters'
 
 export default function EventCard({ event, variant = 'catalog' }) {
   const isFeatured = variant === 'featured'
@@ -25,7 +26,7 @@ export default function EventCard({ event, variant = 'catalog' }) {
 
         {!isFeatured && (
           <p className="text-sm text-slate-400">
-            {event.date} · {event.time}
+            {formatEventDateTime(event.date, event.time)}
           </p>
         )}
 
