@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { events } from '../data/events'
 import EventCard from '../components/EventCard'
+import EventFiltersBar from '../components/EventFiltersBar'
 
 export default function EventsPage() {
   const [search, setSearch] = useState('')
@@ -56,6 +57,13 @@ export default function EventsPage() {
     return sorted
   }, [search, category, status, sortBy])
 
+  function handleClearFilters() {
+    setSearch('')
+    setCategory('Todas')
+    setStatus('Todos')
+    setSortBy('date-asc')
+  }
+
   return (
     <div className="space-y-8">
       <div className="space-y-3">
@@ -68,50 +76,19 @@ export default function EventsPage() {
         </p>
       </div>
 
-      <div className="grid gap-4 rounded-3xl border border-white/10 bg-white/5 p-5 md:grid-cols-[1fr_220px_220px_220px]">
-        <input
-          type="text"
-          placeholder="Buscar por evento o anfitrión..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none placeholder:text-slate-500"
-        />
-
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none"
-        >
-          {categories.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none"
-        >
-          {statuses.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="rounded-2xl border border-white/10 bg-slate-950/70 px-4 py-3 text-white outline-none"
-        >
-          <option value="date-asc">Más próximos</option>
-          <option value="live-first">En vivo primero</option>
-          <option value="free-first">Gratis primero</option>
-          <option value="title-asc">A-Z</option>
-        </select>
-      </div>
+      <EventFiltersBar
+        search={search}
+        category={category}
+        status={status}
+        sortBy={sortBy}
+        categories={categories}
+        statuses={statuses}
+        onSearchChange={setSearch}
+        onCategoryChange={setCategory}
+        onStatusChange={setStatus}
+        onSortChange={setSortBy}
+        onClear={handleClearFilters}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-400">
@@ -119,19 +96,6 @@ export default function EventsPage() {
           {filteredAndSortedEvents.length === 1 ? '' : 's'} encontrado
           {filteredAndSortedEvents.length === 1 ? '' : 's'}
         </p>
-
-        <button
-          type="button"
-          onClick={() => {
-            setSearch('')
-            setCategory('Todas')
-            setStatus('Todos')
-            setSortBy('date-asc')
-          }}
-          className="rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
-        >
-          Limpiar filtros
-        </button>
       </div>
 
       {filteredAndSortedEvents.length === 0 ? (
