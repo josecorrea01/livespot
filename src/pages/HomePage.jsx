@@ -2,9 +2,16 @@ import { Link } from 'react-router'
 import { events } from '../data/events'
 import EventCard from '../components/EventCard'
 import InfoCard from '../components/InfoCard'
+import { formatEventDateTime } from '../utils/eventFormatters'
+import { getReservations } from '../utils/reservationStorage'
 
 export default function HomePage() {
   const featured = events.slice(0, 3)
+  const reservations = getReservations()
+
+  const liveCount = events.filter((event) => event.status === 'En vivo').length
+  const upcomingEvents = events.filter((event) => event.status === 'Próximo')
+  const nextEvent = upcomingEvents[0] || events[0] || null
 
   return (
     <div className="space-y-14">
@@ -16,11 +23,11 @@ export default function HomePage() {
 
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight text-white md:text-5xl">
-              Vive y gestiona experiencias digitales en una sola plataforma.
+              Descubre, reserva y gestiona experiencias digitales en una sola plataforma.
             </h1>
             <p className="max-w-xl text-base leading-7 text-slate-300 md:text-lg">
-              LiveSpot te permite descubrir, reservar y administrar eventos en vivo
-              desde una experiencia simple, moderna y pensada para distintos tipos de usuarios.
+              LiveSpot reúne catálogo, reservas y seguimiento en una experiencia simple,
+              moderna y pensada para usuarios que quieren explorar eventos en vivo con más claridad.
             </p>
           </div>
 
@@ -43,31 +50,50 @@ export default function HomePage() {
         <div className="rounded-3xl border border-white/10 bg-slate-900/70 p-6">
           <div className="grid gap-4 sm:grid-cols-3">
             <InfoCard
-              label="Eventos activos"
-              value="28"
+              label="Eventos disponibles"
+              value={String(events.length)}
               valueClassName="mt-2 text-2xl font-bold text-white"
             />
             <InfoCard
-              label="Usuarios registrados"
-              value="1.4K"
+              label="En vivo ahora"
+              value={String(liveCount)}
               valueClassName="mt-2 text-2xl font-bold text-white"
             />
             <InfoCard
-              label="Satisfacción"
-              value="96%"
+              label="Reservas guardadas"
+              value={String(reservations.length)}
               valueClassName="mt-2 text-2xl font-bold text-white"
             />
           </div>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
-            <p className="text-sm text-slate-400">Próximo gran evento</p>
-            <h3 className="mt-2 text-2xl font-semibold text-white">
-              Neon Nights Experience
-            </h3>
-            <p className="mt-3 text-sm leading-6 text-slate-300">
-              Descubre eventos destacados, gestiona tus reservas y accede a una experiencia digital fluida en un solo lugar.
-            </p>
-          </div>
+          {nextEvent ? (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+              <p className="text-sm text-slate-400">Próximo evento recomendado</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">
+                {nextEvent.title}
+              </h3>
+              <p className="mt-2 text-sm text-slate-400">
+                {formatEventDateTime(nextEvent.date, nextEvent.time)}
+              </p>
+              <p className="mt-3 text-sm leading-6 text-slate-300">
+                {nextEvent.description}
+              </p>
+
+              <Link
+                to={`/events/${nextEvent.id}`}
+                className="mt-4 inline-flex rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-white"
+              >
+                Ver detalle
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5">
+              <p className="text-sm text-slate-400">Próximo evento recomendado</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                Aún no hay eventos disponibles para mostrar.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -81,7 +107,10 @@ export default function HomePage() {
               Eventos seleccionados
             </h2>
           </div>
-          <Link to="/events" className="text-sm font-medium text-slate-300 hover:text-white">
+          <Link
+            to="/events"
+            className="text-sm font-medium text-slate-300 hover:text-white"
+          >
             Ver todos
           </Link>
         </div>
