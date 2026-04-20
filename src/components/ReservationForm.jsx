@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { saveReservation } from '../utils/reservationStorage'
 
-export default function ReservationForm({ eventTitle }) {
+export default function ReservationForm({ event }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -62,8 +63,19 @@ export default function ReservationForm({ eventTitle }) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 900))
 
+      saveReservation({
+        eventId: event.id,
+        title: event.title,
+        date: event.date,
+        time: event.time,
+        status: event.status,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        reservedAt: new Date().toISOString(),
+      })
+
       setSuccessMessage(
-        `Reserva confirmada para ${eventTitle}. Hemos enviado la confirmación a ${formData.email}.`
+        `Reserva confirmada para ${event.title}. Hemos enviado la confirmación a ${formData.email}.`
       )
 
       setFormData({

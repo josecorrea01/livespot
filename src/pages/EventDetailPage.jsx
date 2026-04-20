@@ -73,7 +73,7 @@ export default function EventDetailPage() {
         </div>
       </section>
 
-      <ReservationForm eventTitle={event.title} />
+      <ReservationForm event={event} />
     </div>
   )
 }
