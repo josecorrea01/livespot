@@ -93,37 +93,55 @@ export default function ReservationForm({ event }) {
       <p className="mt-3 text-sm leading-6 text-slate-300">
         Completa tus datos para reservar tu acceso al evento.
       </p>
+      <p className="mt-2 text-xs leading-5 text-slate-400">
+        Los campos marcados son obligatorios. Recibirás la confirmación en el correo ingresado.
+      </p>
+
+      <div className="mt-5 rounded-2xl border border-white/10 bg-white/5 p-4">
+        <p className="text-sm text-slate-400">Evento seleccionado</p>
+        <p className="mt-1 font-medium text-white">{event.title}</p>
+      </div>
 
       {successMessage && (
-        <div className="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm leading-6 text-emerald-200">
+        <div
+          className="mt-5 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm leading-6 text-emerald-200"
+          aria-live="polite"
+        >
           {successMessage}
         </div>
       )}
 
-      <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+      <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
         <FormField
+          id="reservation-name"
+          label="Nombre"
           type="text"
           name="name"
-          placeholder="Tu nombre"
+          placeholder="Ej: José Correa"
           value={formData.name}
           onChange={handleChange}
           error={errors.name}
           disabled={isSubmitting}
+          autoComplete="name"
         />
 
         <FormField
+          id="reservation-email"
+          label="Correo electrónico"
           type="email"
           name="email"
-          placeholder="Tu correo"
+          placeholder="tucorreo@ejemplo.com"
           value={formData.email}
           onChange={handleChange}
           error={errors.email}
           disabled={isSubmitting}
+          autoComplete="email"
         />
 
         <button
           type="submit"
           disabled={isSubmitting}
+          aria-busy={isSubmitting}
           className={`w-full rounded-2xl px-4 py-3 font-semibold text-white transition ${
             isSubmitting
               ? 'cursor-not-allowed bg-indigo-300/60'
@@ -138,6 +156,8 @@ export default function ReservationForm({ event }) {
 }
 
 function FormField({
+  id,
+  label,
   type,
   name,
   placeholder,
@@ -145,23 +165,46 @@ function FormField({
   onChange,
   error,
   disabled,
+  autoComplete,
 }) {
+  const errorId = `${id}-error`
+  const helpId = `${id}-help`
+
   return (
-    <div>
+    <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-slate-200">
+        {label}
+      </label>
+
       <input
+        id={id}
         type={type}
         name={name}
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         disabled={disabled}
+        autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : helpId}
         className={`w-full rounded-2xl border bg-white/5 px-4 py-3 text-white outline-none placeholder:text-slate-500 disabled:cursor-not-allowed disabled:opacity-70 ${
           error
             ? 'border-rose-400/60 focus:border-rose-400'
             : 'border-white/10 focus:border-indigo-400'
         }`}
       />
-      {error && <p className="mt-2 text-sm text-rose-300">{error}</p>}
+
+      {error ? (
+        <p id={errorId} className="text-sm text-rose-300" role="alert">
+          {error}
+        </p>
+      ) : (
+        <p id={helpId} className="text-xs text-slate-500">
+          {type === 'email'
+            ? 'Usa un correo válido para recibir la confirmación.'
+            : 'Ingresa tu nombre tal como quieres que aparezca en la reserva.'}
+        </p>
+      )}
     </div>
   )
 }
