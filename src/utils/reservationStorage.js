@@ -5,7 +5,8 @@ export function getReservations() {
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
+    const parsed = raw ? JSON.parse(raw) : []
+    return Array.isArray(parsed) ? parsed : []
   } catch {
     return []
   }
@@ -24,4 +25,20 @@ export function saveReservation(reservation) {
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
   return next
+}
+
+export function removeReservation(eventId, email) {
+  const current = getReservations()
+
+  const next = current.filter(
+    (item) => !(item.eventId === eventId && item.email === email)
+  )
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  return next
+}
+
+export function clearReservations() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([]))
+  return []
 }
