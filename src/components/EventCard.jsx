@@ -1,7 +1,11 @@
 import { Link } from 'react-router'
 import { formatEventDateTime } from '../utils/eventFormatters'
 
-export default function EventCard({ event, variant = 'catalog' }) {
+export default function EventCard({
+  event,
+  variant = 'catalog',
+  isReserved = false,
+}) {
   const isFeatured = variant === 'featured'
 
   return (
@@ -17,9 +21,18 @@ export default function EventCard({ event, variant = 'catalog' }) {
           <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
             {event.category}
           </span>
-          <span className="text-xs text-indigo-300">
-            {isFeatured ? event.status : event.price}
-          </span>
+
+          <div className="flex items-center gap-2">
+            {isReserved && (
+              <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs text-emerald-300">
+                Reservado
+              </span>
+            )}
+
+            <span className="text-xs text-indigo-300">
+              {isFeatured ? event.status : event.price}
+            </span>
+          </div>
         </div>
 
         <h3 className="text-xl font-semibold text-white">{event.title}</h3>
@@ -40,7 +53,7 @@ export default function EventCard({ event, variant = 'catalog' }) {
               : 'inline-flex rounded-xl bg-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-400'
           }
         >
-          Ver detalle
+          {isReserved ? 'Ver reserva' : 'Ver detalle'}
         </Link>
       </div>
     </article>

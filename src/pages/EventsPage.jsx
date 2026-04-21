@@ -2,12 +2,16 @@ import { useMemo, useState } from 'react'
 import { events } from '../data/events'
 import EventCard from '../components/EventCard'
 import EventFiltersBar from '../components/EventFiltersBar'
+import { getReservations } from '../utils/reservationStorage'
 
 export default function EventsPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('Todas')
   const [status, setStatus] = useState('Todos')
   const [sortBy, setSortBy] = useState('date-asc')
+
+  const reservations = getReservations()
+  const reservedEventIds = new Set(reservations.map((item) => item.eventId))
 
   const categories = ['Todas', ...new Set(events.map((event) => event.category))]
   const statuses = ['Todos', ...new Set(events.map((event) => event.status))]
@@ -110,7 +114,11 @@ export default function EventsPage() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {filteredAndSortedEvents.map((event) => (
-            <EventCard key={event.id} event={event} />
+            <EventCard
+              key={event.id}
+              event={event}
+              isReserved={reservedEventIds.has(event.id)}
+            />
           ))}
         </div>
       )}

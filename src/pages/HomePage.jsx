@@ -8,6 +8,7 @@ import { getReservations } from '../utils/reservationStorage'
 export default function HomePage() {
   const featured = events.slice(0, 3)
   const reservations = getReservations()
+  const reservedEventIds = new Set(reservations.map((item) => item.eventId))
 
   const liveCount = events.filter((event) => event.status === 'En vivo').length
   const upcomingEvents = events.filter((event) => event.status === 'Próximo')
@@ -117,7 +118,12 @@ export default function HomePage() {
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {featured.map((event) => (
-            <EventCard key={event.id} event={event} variant="featured" />
+            <EventCard
+              key={event.id}
+              event={event}
+              variant="featured"
+              isReserved={reservedEventIds.has(event.id)}
+            />
           ))}
         </div>
       </section>
