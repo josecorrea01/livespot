@@ -26,8 +26,8 @@ export default function DashboardPage() {
     { label: 'Reservas guardadas', value: String(reservations.length) },
   ]
 
-  function handleRemoveReservation(eventId, email) {
-    const next = removeReservation(eventId, email)
+  function handleRemoveReservation(eventId) {
+    const next = removeReservation(eventId)
     setReservations(next)
   }
 
@@ -114,7 +114,7 @@ export default function DashboardPage() {
             <div className="mt-4 space-y-3">
               {recentReservations.map((reservation) => (
                 <div
-                  key={`${reservation.eventId}-${reservation.email}`}
+                  key={reservation.eventId}
                   className="rounded-2xl border border-white/10 bg-white/5 p-4"
                 >
                   <p className="text-sm text-slate-400">Reserva registrada</p>
@@ -138,12 +138,7 @@ export default function DashboardPage() {
 
                     <button
                       type="button"
-                      onClick={() =>
-                        handleRemoveReservation(
-                          reservation.eventId,
-                          reservation.email
-                        )
-                      }
+                      onClick={() => handleRemoveReservation(reservation.eventId)}
                       className="inline-flex rounded-xl border border-rose-400/20 px-4 py-2 text-sm font-semibold text-rose-300 transition hover:bg-rose-500/10"
                     >
                       Eliminar reserva

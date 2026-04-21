@@ -1,11 +1,18 @@
 import { useState } from 'react'
-import { saveReservation } from '../utils/reservationStorage'
+import {
+  getReservationByEventId,
+  saveReservation,
+} from '../utils/reservationStorage'
 
 export default function ReservationForm({ event }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-  })
+  const [existingReservation, setExistingReservation] = useState(() =>
+    getReservationByEventId(event.id)
+  )
+
+  const [formData, setFormData] = useState(() => ({
+    name: existingReservation?.name || '',
+    email: existingReservation?.email || '',
+  }))
 
   const [errors, setErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
@@ -63,7 +70,7 @@ export default function ReservationForm({ event }) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 900))
 
-      saveReservation({
+      const savedReservation = {
         eventId: event.id,
         title: event.title,
         date: event.date,
@@ -72,15 +79,20 @@ export default function ReservationForm({ event }) {
         name: formData.name.trim(),
         email: formData.email.trim(),
         reservedAt: new Date().toISOString(),
-      })
+      }
+
+      saveReservation(savedReservation)
+      setExistingReservation(savedReservation)
 
       setSuccessMessage(
-        `Reserva confirmada para ${event.title}. Hemos enviado la confirmación a ${formData.email}.`
+        existingReservation
+          ? `Reserva actualizada para ${event.title}.`
+          : `Reserva confirmada para ${event.title}. Hemos enviado la confirmación a ${formData.email}.`
       )
 
       setFormData({
-        name: '',
-        email: '',
+        name: savedReservation.name,
+        email: savedReservation.email,
       })
     } finally {
       setIsSubmitting(false)
@@ -101,6 +113,13 @@ export default function ReservationForm({ event }) {
         <p className="text-sm text-slate-400">Evento seleccionado</p>
         <p className="mt-1 font-medium text-white">{event.title}</p>
       </div>
+
+      {existingReservation && (
+        <div className="mt-5 rounded-2xl border border-indigo-400/20 bg-indigo-500/10 px-4 py-3 text-sm leading-6 text-indigo-200">
+          Ya existe una reserva guardada para este evento en este navegador.
+          Puedes actualizar tus datos si lo necesitas.
+        </div>
+      )}
 
       {successMessage && (
         <div
@@ -148,7 +167,11 @@ export default function ReservationForm({ event }) {
               : 'bg-indigo-500 hover:bg-indigo-400'
           }`}
         >
-          {isSubmitting ? 'Procesando reserva...' : 'Reservar lugar'}
+          {isSubmitting
+            ? 'Procesando reserva...'
+            : existingReservation
+              ? 'Actualizar reserva'
+              : 'Reservar lugar'}
         </button>
       </form>
     </aside>

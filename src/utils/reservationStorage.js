@@ -12,27 +12,26 @@ export function getReservations() {
   }
 }
 
+export function getReservationByEventId(eventId) {
+  return getReservations().find((item) => item.eventId === eventId) || null
+}
+
 export function saveReservation(reservation) {
   const current = getReservations()
 
   const next = [
     reservation,
-    ...current.filter(
-      (item) =>
-        !(item.eventId === reservation.eventId && item.email === reservation.email)
-    ),
+    ...current.filter((item) => item.eventId !== reservation.eventId),
   ]
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
   return next
 }
 
-export function removeReservation(eventId, email) {
+export function removeReservation(eventId) {
   const current = getReservations()
 
-  const next = current.filter(
-    (item) => !(item.eventId === eventId && item.email === email)
-  )
+  const next = current.filter((item) => item.eventId !== eventId)
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
   return next
