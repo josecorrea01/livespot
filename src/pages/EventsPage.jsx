@@ -1,14 +1,17 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router'
 import { events } from '../data/events'
 import EventCard from '../components/EventCard'
 import EventFiltersBar from '../components/EventFiltersBar'
 import { getReservations } from '../utils/reservationStorage'
 
 export default function EventsPage() {
-  const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('Todas')
-  const [status, setStatus] = useState('Todos')
-  const [sortBy, setSortBy] = useState('date-asc')
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const search = searchParams.get('search') || ''
+  const category = searchParams.get('category') || 'Todas'
+  const status = searchParams.get('status') || 'Todos'
+  const sortBy = searchParams.get('sort') || 'date-asc'
 
   const reservations = getReservations()
   const reservedEventIds = new Set(reservations.map((item) => item.eventId))
@@ -61,11 +64,27 @@ export default function EventsPage() {
     return sorted
   }, [search, category, status, sortBy])
 
+  function updateParams(nextValues) {
+    const next = new URLSearchParams(searchParams)
+
+    Object.entries(nextValues).forEach(([key, value]) => {
+      if (
+        value === '' ||
+        value === 'Todas' ||
+        value === 'Todos' ||
+        value === 'date-asc'
+      ) {
+        next.delete(key)
+      } else {
+        next.set(key, value)
+      }
+    })
+
+    setSearchParams(next)
+  }
+
   function handleClearFilters() {
-    setSearch('')
-    setCategory('Todas')
-    setStatus('Todos')
-    setSortBy('date-asc')
+    setSearchParams({})
   }
 
   return (
@@ -87,10 +106,10 @@ export default function EventsPage() {
         sortBy={sortBy}
         categories={categories}
         statuses={statuses}
-        onSearchChange={setSearch}
-        onCategoryChange={setCategory}
-        onStatusChange={setStatus}
-        onSortChange={setSortBy}
+        onSearchChange={(value) => updateParams({ search: value })}
+        onCategoryChange={(value) => updateParams({ category: value })}
+        onStatusChange={(value) => updateParams({ status: value })}
+        onSortChange={(value) => updateParams({ sort: value })}
         onClear={handleClearFilters}
       />
 
