@@ -3,18 +3,16 @@ import { useSearchParams } from 'react-router'
 import { events } from '../data/events'
 import EventCard from '../components/EventCard'
 import EventFiltersBar from '../components/EventFiltersBar'
-import { getReservations } from '../utils/reservationStorage'
+import useReservations from '../hooks/useReservations'
 
 export default function EventsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
+  const { isReserved } = useReservations()
 
   const search = searchParams.get('search') || ''
   const category = searchParams.get('category') || 'Todas'
   const status = searchParams.get('status') || 'Todos'
   const sortBy = searchParams.get('sort') || 'date-asc'
-
-  const reservations = getReservations()
-  const reservedEventIds = new Set(reservations.map((item) => item.eventId))
 
   const categories = ['Todas', ...new Set(events.map((event) => event.category))]
   const statuses = ['Todos', ...new Set(events.map((event) => event.status))]
@@ -136,7 +134,7 @@ export default function EventsPage() {
             <EventCard
               key={event.id}
               event={event}
-              isReserved={reservedEventIds.has(event.id)}
+              isReserved={isReserved(event.id)}
             />
           ))}
         </div>

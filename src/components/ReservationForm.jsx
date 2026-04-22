@@ -1,12 +1,11 @@
-import { useState } from 'react'
-import {
-  getReservationByEventId,
-  saveReservation,
-} from '../utils/reservationStorage'
+import { useEffect, useState } from 'react'
+import useReservations from '../hooks/useReservations'
 
 export default function ReservationForm({ event }) {
+  const { getReservation, save } = useReservations()
+
   const [existingReservation, setExistingReservation] = useState(() =>
-    getReservationByEventId(event.id)
+    getReservation(event.id)
   )
 
   const [formData, setFormData] = useState(() => ({
@@ -17,6 +16,15 @@ export default function ReservationForm({ event }) {
   const [errors, setErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  useEffect(() => {
+    const reservation = getReservation(event.id)
+    setExistingReservation(reservation)
+    setFormData({
+      name: reservation?.name || '',
+      email: reservation?.email || '',
+    })
+  }, [event.id, getReservation])
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -81,7 +89,7 @@ export default function ReservationForm({ event }) {
         reservedAt: new Date().toISOString(),
       }
 
-      saveReservation(savedReservation)
+      save(savedReservation)
       setExistingReservation(savedReservation)
 
       setSuccessMessage(

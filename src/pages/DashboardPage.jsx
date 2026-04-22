@@ -1,16 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { Link } from 'react-router'
 import { events } from '../data/events'
 import InfoCard from '../components/InfoCard'
 import { formatEventDateTime } from '../utils/eventFormatters'
-import {
-  clearReservations,
-  getReservations,
-  removeReservation,
-} from '../utils/reservationStorage'
+import useReservations from '../hooks/useReservations'
 
 export default function DashboardPage() {
-  const [reservations, setReservations] = useState(() => getReservations())
+  const { reservations, remove, clear } = useReservations()
 
   const liveCount = events.filter((event) => event.status === 'En vivo').length
   const upcomingEvents = events.filter((event) => event.status === 'Próximo')
@@ -25,16 +21,6 @@ export default function DashboardPage() {
     { label: 'En vivo ahora', value: String(liveCount) },
     { label: 'Reservas guardadas', value: String(reservations.length) },
   ]
-
-  function handleRemoveReservation(eventId) {
-    const next = removeReservation(eventId)
-    setReservations(next)
-  }
-
-  function handleClearReservations() {
-    const next = clearReservations()
-    setReservations(next)
-  }
 
   return (
     <div className="space-y-8">
@@ -102,7 +88,7 @@ export default function DashboardPage() {
             {reservations.length > 0 && (
               <button
                 type="button"
-                onClick={handleClearReservations}
+                onClick={clear}
                 className="rounded-xl border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 transition hover:bg-white/10 hover:text-white"
               >
                 Limpiar todas
@@ -138,7 +124,7 @@ export default function DashboardPage() {
 
                     <button
                       type="button"
-                      onClick={() => handleRemoveReservation(reservation.eventId)}
+                      onClick={() => remove(reservation.eventId)}
                       className="inline-flex rounded-xl border border-rose-400/20 px-4 py-2 text-sm font-semibold text-rose-300 transition hover:bg-rose-500/10"
                     >
                       Eliminar reserva

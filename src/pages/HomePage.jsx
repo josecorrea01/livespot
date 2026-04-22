@@ -3,12 +3,11 @@ import { events } from '../data/events'
 import EventCard from '../components/EventCard'
 import InfoCard from '../components/InfoCard'
 import { formatEventDateTime } from '../utils/eventFormatters'
-import { getReservations } from '../utils/reservationStorage'
+import useReservations from '../hooks/useReservations'
 
 export default function HomePage() {
   const featured = events.slice(0, 3)
-  const reservations = getReservations()
-  const reservedEventIds = new Set(reservations.map((item) => item.eventId))
+  const { reservations, isReserved } = useReservations()
 
   const liveCount = events.filter((event) => event.status === 'En vivo').length
   const upcomingEvents = events.filter((event) => event.status === 'Próximo')
@@ -122,7 +121,7 @@ export default function HomePage() {
               key={event.id}
               event={event}
               variant="featured"
-              isReserved={reservedEventIds.has(event.id)}
+              isReserved={isReserved(event.id)}
             />
           ))}
         </div>
