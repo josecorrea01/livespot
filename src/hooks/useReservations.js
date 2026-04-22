@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
+  RESERVATIONS_CHANGED_EVENT,
   clearReservations,
-  getReservationByEventId,
   getReservations,
   removeReservation,
   saveReservation,
@@ -14,6 +14,35 @@ export default function useReservations() {
     () => new Set(reservations.map((item) => item.eventId)),
     [reservations]
   )
+
+  const refresh = useCallback(() => {
+    const next = getReservations()
+    setReservations(next)
+    return next
+  }, [])
+
+  useEffect(() => {
+    function handleReservationsChanged() {
+      refresh()
+    }
+
+    function handleStorage(e) {
+      if (e.key === 'livespot_reservations') {
+        refresh()
+      }
+    }
+
+    window.addEventListener(RESERVATIONS_CHANGED_EVENT, handleReservationsChanged)
+    window.addEventListener('storage', handleStorage)
+
+    return () => {
+      window.removeEventListener(
+        RESERVATIONS_CHANGED_EVENT,
+        handleReservationsChanged
+      )
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [refresh])
 
   const isReserved = useCallback(
     (eventId) => reservedEventIds.has(eventId),
@@ -39,12 +68,6 @@ export default function useReservations() {
 
   const clear = useCallback(() => {
     const next = clearReservations()
-    setReservations(next)
-    return next
-  }, [])
-
-  const refresh = useCallback(() => {
-    const next = getReservations()
     setReservations(next)
     return next
   }, [])

@@ -1,4 +1,11 @@
 const STORAGE_KEY = 'livespot_reservations'
+const RESERVATIONS_CHANGED_EVENT = 'livespot:reservations-changed'
+
+function emitReservationsChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(RESERVATIONS_CHANGED_EVENT))
+  }
+}
 
 export function getReservations() {
   if (typeof window === 'undefined') return []
@@ -25,6 +32,7 @@ export function saveReservation(reservation) {
   ]
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  emitReservationsChanged()
   return next
 }
 
@@ -34,10 +42,14 @@ export function removeReservation(eventId) {
   const next = current.filter((item) => item.eventId !== eventId)
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+  emitReservationsChanged()
   return next
 }
 
 export function clearReservations() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify([]))
+  emitReservationsChanged()
   return []
 }
+
+export { RESERVATIONS_CHANGED_EVENT }
