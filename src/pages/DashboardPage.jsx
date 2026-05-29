@@ -5,21 +5,84 @@ import InfoCard from '../components/InfoCard'
 import { formatEventDateTime } from '../utils/eventFormatters'
 import useReservations from '../hooks/useReservations'
 
+function getEventTimestamp(item) {
+  return new Date(`${item.date}T${item.time || '00:00'}`).getTime()
+}
+
 export default function DashboardPage() {
   const { reservations, remove, clear } = useReservations()
 
-  const liveCount = events.filter((event) => event.status === 'En vivo').length
-  const upcomingEvents = events.filter((event) => event.status === 'Próximo')
+  const liveCount = useMemo(
+    () => events.filter((event) => event.status === 'En vivo').length,
+    []
+  )
+
+  const upcomingEvents = useMemo(
+    () =>
+      events
+        .filter((event) => event.status === 'Próximo')
+        .sort((a, b) => getEventTimestamp(a) - getEventTimestamp(b)),
+    []
+  )
 
   const recentReservations = useMemo(
     () => reservations.slice(0, 3),
     [reservations]
   )
 
+  const dashboardMetrics = useMemo(() => {
+    const sortedReservations = [...reservations].sort(
+      (a, b) => getEventTimestamp(a) - getEventTimestamp(b)
+    )
+
+    const nextReservation = sortedReservations[0] || null
+    const latestReservation = reservations[0] || null
+
+    const reservedEventIds = new Set(
+      reservations.map((reservation) => reservation.eventId)
+    )
+
+    const reservedEvents = events.filter((event) => reservedEventIds.has(event.id))
+
+    const categoryCount = reservedEvents.reduce((acc, event) => {
+      acc[event.category] = (acc[event.category] || 0) + 1
+      return acc
+    }, {})
+
+    const [topCategory, topCategoryCount] =
+      Object.entries(categoryCount).sort(([, a], [, b]) => b - a)[0] || []
+
+    return {
+      nextReservation,
+      latestReservation,
+      topCategory,
+      topCategoryCount,
+    }
+  }, [reservations])
+
   const cards = [
-    { label: 'Eventos disponibles', value: String(events.length) },
-    { label: 'En vivo ahora', value: String(liveCount) },
-    { label: 'Reservas guardadas', value: String(reservations.length) },
+    {
+      label: 'Eventos disponibles',
+      value: String(events.length),
+    },
+    {
+      label: 'En vivo ahora',
+      value: String(liveCount),
+    },
+    {
+      label: 'Reservas guardadas',
+      value: String(reservations.length),
+    },
+    {
+      label: 'Próxima reserva',
+      value: dashboardMetrics.nextReservation
+        ? formatEventDateTime(
+            dashboardMetrics.nextReservation.date,
+            dashboardMetrics.nextReservation.time
+          )
+        : 'Sin reservas',
+      valueClassName: 'mt-3 text-xl font-bold text-white',
+    },
   ]
 
   return (
@@ -30,22 +93,62 @@ export default function DashboardPage() {
         </p>
         <h1 className="text-3xl font-bold text-white">Tu espacio en LiveSpot</h1>
         <p className="mt-3 max-w-2xl text-slate-300">
-          Consulta el estado general de la plataforma, revisa próximos eventos
-          y administra tus reservas recientes.
+          Consulta el estado general de la plataforma, revisa próximos eventos,
+          administra tus reservas y visualiza indicadores simples de actividad.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4">
         {cards.map((card) => (
           <InfoCard
             key={card.label}
             label={card.label}
             value={card.value}
             cardClassName="rounded-3xl border border-white/10 bg-white/5 p-6"
-            valueClassName="mt-3 text-3xl font-bold text-white"
+            valueClassName={
+              card.valueClassName || 'mt-3 text-3xl font-bold text-white'
+            }
           />
         ))}
       </div>
+
+      <section className="rounded-3xl border border-white/10 bg-indigo-500/10 p-6">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <p className="text-sm uppercase tracking-wider text-indigo-300">
+              resumen de actividad
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-white">
+              Indicadores útiles para el usuario
+            </h2>
+            <p className="mt-3 text-slate-300">
+              Este panel resume información clave de reservas y eventos. En una
+              versión full stack, estos datos podrían evolucionar hacia métricas
+              reales para usuarios, clientes y equipos internos.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+              <p className="text-sm text-slate-400">Última reserva</p>
+              <p className="mt-2 font-semibold text-white">
+                {dashboardMetrics.latestReservation
+                  ? dashboardMetrics.latestReservation.title
+                  : 'Sin actividad reciente'}
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-4">
+              <p className="text-sm text-slate-400">Categoría reservada</p>
+              <p className="mt-2 font-semibold text-white">
+                {dashboardMetrics.topCategory
+                  ? `${dashboardMetrics.topCategory} (${dashboardMetrics.topCategoryCount})`
+                  : 'Sin datos todavía'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
@@ -65,7 +168,8 @@ export default function DashboardPage() {
                   <div>
                     <p className="font-medium text-white">{event.title}</p>
                     <p className="mt-1 text-sm text-slate-400">
-                      {formatEventDateTime(event.date, event.time)} · {event.category}
+                      {formatEventDateTime(event.date, event.time)} ·{' '}
+                      {event.category}
                     </p>
                   </div>
 
@@ -141,7 +245,8 @@ export default function DashboardPage() {
             </div>
           ) : (
             <p className="mt-4 text-slate-300">
-              Aún no has reservado eventos. Explora el catálogo y guarda tu primera reserva.
+              Aún no has reservado eventos. Explora el catálogo y guarda tu
+              primera reserva.
             </p>
           )}
         </section>
